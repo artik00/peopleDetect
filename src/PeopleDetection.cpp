@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string>
 #include <string.h>// std::string, std::to_string
+#include <assert.h>
 
 #define ODROID1 "http://192.168.0.101:8080/?action=stream"
 #define ODROID2 "http://192.168.0.106:8080/?action=stream"
@@ -78,15 +79,15 @@ int main (int argc, const char * argv[])
 {
 	printf("Hello\n");
 	cout << "Hello Artyom" << endl << flush ;
-    VideoCapture cap,cap1,cap2,cap3,cap4;
+    VideoCapture cap;
     Odroid *odroid1 = new Odroid();
     Odroid *odroid2 = new Odroid();
     Odroid *odroid3 = new Odroid();
     Odroid *odroid4 = new Odroid();
     odroid1->cap.open(ODROID1);
-    odroid2->cap.open(ODROID2);
-    odroid3->cap.open(ODROID3);
-    odroid4->cap.open(ODROID4);
+   // odroid2->cap.open(ODROID2);
+  //  odroid3->cap.open(ODROID3);
+ //   odroid4->cap.open(ODROID4);
     odroid1->leftNeighbour=odroid1;
     odroid1->rightNeighbour=odroid2;
     odroid1->leftOverlap=0;
@@ -99,7 +100,7 @@ int main (int argc, const char * argv[])
     odroid4->rightOverlap = 0;
 
     Mat img;
-    cap=cap1;
+    cap = odroid1->cap;
 
 
     string Pos = "";
@@ -107,30 +108,28 @@ int main (int argc, const char * argv[])
     hog.setSVMDetector(HOGDescriptor::getDefaultPeopleDetector());
     string posPoint = "";
     string posRect ="";
-    int numberOfloops = 0;
     int currentCamera= 1;
     while (true)
     {
 
-    	if(++numberOfloops == 200){
-    		numberOfloops = 0;
+    	if(false){
 
 
     		switch(currentCamera)
     		{
     		case 1:
     			currentCamera = 2;
-    			cap = cap2;
+    			//cap = cap2;
     			cout << "chagned to cam2" << endl;
     			break;
     		case 2:
     			currentCamera = 3;
-    			cap = cap3;
+    			//cap = cap3;
     			cout << "chagned to cam3" << endl;
     			break;
     		case 3:
     			currentCamera = 4;
-    			cap = cap4;
+    			//cap = cap4;
     			cout << "chagned to cam4" << endl;
     			break;
     		default:
@@ -145,14 +144,13 @@ int main (int argc, const char * argv[])
             continue;
 
         vector<Rect> found, found_filtered;
-        vector<Point> found1, found_filtered1;
+        //vector<Point> found1, found_filtered1;
         hog.detectMultiScale(img, found, 0, Size(8,8), Size(32,32), 1.05, 2);
-        hog.detect(img, found1, 0, Size(8,8), Size(0,0));
+        //hog.detect(img, found1, 0, Size(8,8), Size(0,0));
 
         size_t i, j;
 
-
-
+        /*
         for (i = 0 ; i < found1.size(); i++){
 
         	Point tempPoint = found1[i];
@@ -172,6 +170,7 @@ int main (int argc, const char * argv[])
 
 
         }
+*/
 
         for (i=0; i<found.size(); i++)
         {
