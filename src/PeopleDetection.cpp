@@ -71,9 +71,10 @@ struct Odroid {
 	Odroid* leftNeighbour;
 	int StartXCoordinate= 0;
 	int EndXCoordinate=320;
-	int leftOverlap =20;
-	int rightOverlap=20;
+	int leftOverlap =90;
+	int rightOverlap=90;
 	int currentX;
+	int length = 320;
 };
 
 int main (int argc, const char * argv[])
@@ -82,15 +83,15 @@ int main (int argc, const char * argv[])
 
 	cout << "Hello Artyom" << endl << flush ;
     VideoCapture cap;
-    Odroid *currentOroid;
+    Odroid *currentOdroid;
     Odroid *odroid1 = new Odroid();
     Odroid *odroid2 = new Odroid();
     Odroid *odroid3 = new Odroid();
     Odroid *odroid4 = new Odroid();
     odroid1->cap.open(ODROID1);
-   // odroid2->cap.open(ODROID2);
-  //  odroid3->cap.open(ODROID3);
- //   odroid4->cap.open(ODROID4);
+    odroid2->cap.open(ODROID2);
+   // odroid3->cap.open(ODROID3);
+   // odroid4->cap.open(ODROID4);
     odroid1->leftNeighbour=odroid1;
     odroid1->rightNeighbour=odroid2;
     odroid1->leftOverlap=0;
@@ -107,7 +108,7 @@ int main (int argc, const char * argv[])
 
 
     cap = odroid1->cap;
-    currentOroid = odroid1;
+    currentOdroid = odroid1;
 
     string Pos = "";
     HOGDescriptor hog;
@@ -125,19 +126,55 @@ int main (int argc, const char * argv[])
     		{
     		case 1:
     			globalX = odroid1->currentX;
-    			//currentCamera = 2;
-    			//cap = cap2;
-    			cout << "chagned to cam2" << endl;
+    			if (odroid1->currentX > (odroid1->EndXCoordinate - odroid1->rightOverlap)){
+        			currentCamera = 2;
+        			cap = odroid2->cap;
+        			currentOdroid = odroid2;
+        			cout << "chagned to cam2" << endl;
+    			}
     			break;
     		case 2:
-    			currentCamera = 3;
-    			//cap = cap3;
-    			cout << "chagned to cam3" << endl;
+    			globalX = odroid1->length + odroid2->currentX - odroid2->leftOverlap;
+    			if(odroid2->currentX < (odroid2->StartXCoordinate + odroid2->leftOverlap)){
+        			currentCamera = 1;
+        			cap = odroid1->cap;
+        			currentOdroid = odroid1;
+        			cout << "chagned to cam1" << endl;
+    			}
+    			if(odroid2->currentX > (odroid2->EndXCoordinate - odroid2->rightOverlap)){
+        			currentCamera = 3;
+        			cap = odroid3->cap;
+        			currentOdroid = odroid3;
+        			cout << "chagned to cam3" << endl;
+    			}
+
     			break;
     		case 3:
-    			currentCamera = 4;
-    			//cap = cap4;
-    			cout << "chagned to cam4" << endl;
+    			globalX = odroid1->length + odroid2->length  +  odroid3->currentX
+    						- odroid3->leftOverlap;
+    			if(odroid3->currentX < (odroid3->StartXCoordinate + odroid3->leftOverlap)){
+        			currentCamera = 2;
+        			cap = odroid2->cap;
+        			currentOdroid = odroid2;
+        			cout << "chagned to cam 2" << endl;
+    			}
+    			if(odroid3->currentX > (odroid3->EndXCoordinate - odroid3->rightOverlap)){
+        			currentCamera = 4;
+        			cap = odroid4->cap;
+        			currentOdroid = odroid4;
+        			cout << "chagned to cam 4" << endl;
+    			}
+    			break;
+    		case 4:
+    			globalX = odroid1->length + odroid2->length  +  odroid3->length
+    					+ odroid4->currentX - odroid4->leftOverlap ;
+    			if (odroid4->currentX > (odroid4->StartXCoordinate - odroid1->leftOverlap)){
+        			currentCamera = 3;
+        			cap = odroid3->cap;
+        			currentOdroid = odroid3;
+        			cout << "chagned to cam 3" << endl;
+    			}
+
     			break;
     		default:
     			break;
@@ -175,7 +212,7 @@ int main (int argc, const char * argv[])
 			r.y += cvRound(r.height*0.06);
 			r.height = cvRound(r.height*0.9);
 
-			currentOroid->currentX = r.x;
+			currentOdroid->currentX = r.x;
 
 			string x = to_string(r.x);
 			string y = to_string(r.y);
