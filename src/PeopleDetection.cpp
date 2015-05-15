@@ -138,39 +138,18 @@ int main (int argc, const char * argv[])
 
     	}
         cap >> img;
-      //  cap1 >> img2;
+
 
         if (!img.data)
             continue;
 
         vector<Rect> found, found_filtered;
-        //vector<Point> found1, found_filtered1;
+
         hog.detectMultiScale(img, found, 0, Size(8,8), Size(32,32), 1.05, 2);
-        //hog.detect(img, found1, 0, Size(8,8), Size(0,0));
+
 
         size_t i, j;
 
-        /*
-        for (i = 0 ; i < found1.size(); i++){
-
-        	Point tempPoint = found1[i];
-
-    	    Rect r ;
-    	    if (tempPoint.x > 0 && tempPoint.y > 0) {
-    	    r.x += tempPoint.x;
-            r.y += tempPoint.y;
-
-    	    r.width = 10;
-    	    r.height = 10;
-        	rectangle(img, r.tl(), r.br(), cv::Scalar(255,0,0), 2);
-    	    string x = to_string(r.x);
-    	    string y = to_string(r.y);
-    	    posPoint = "Pos: x:" + x+ " y: " + y;
-    	    }
-
-
-        }
-*/
 
         for (i=0; i<found.size(); i++)
         {
@@ -189,9 +168,9 @@ int main (int argc, const char * argv[])
 	    r.y += cvRound(r.height*0.06);
 	    r.height = cvRound(r.height*0.9);
 
-//	    string x = to_string(r.x);
+	    string x = to_string(r.x);
 	    string y = to_string(r.y);
-	  //  posRect = "Pos: x:" + x+ " y: " + y;
+	    posRect = "Pos: x:" + x+ " y: " + y;
 
 	    rectangle(img, r.tl(), r.br(), cv::Scalar(0,255,0), 2);
         }
@@ -202,8 +181,8 @@ int main (int argc, const char * argv[])
         sprintf(text, "Score %d", (int)number);
 
         CvFont font;
-        double hScale=1.0;
-        double vScale=1.0;
+        double hScale=0.5;
+        double vScale=0.5;
         int    lineWidth=1;
         cvInitFont(&font,CV_FONT_HERSHEY_SIMPLEX|CV_FONT_ITALIC, hScale,vScale,0,lineWidth);
 
@@ -213,11 +192,8 @@ int main (int argc, const char * argv[])
 
         memcpy(p, posRect.c_str(), posRect.length()+1);
 
-        cvPutText(img1, p, cvPoint(200,400), &font, cvScalar(0,255,0));
+        cvPutText(img1, p, cvPoint(10,300), &font, cvScalar(0,255,0));
 
-        char* p2 = new char[posPoint.length()+1];
-        memcpy(p2, posPoint.c_str(), posPoint.length()+1);
-        cvPutText(img1, p2, cvPoint(200,430), &font, cvScalar(255,255,255));
 
         imshow("video capture", img);
         if (waitKey(1) >= 0)
@@ -225,7 +201,6 @@ int main (int argc, const char * argv[])
 
     }
 
-    //namedWindow("video capture", CV_WINDOW_AUTOSIZE);
 
     return 0;
 }
