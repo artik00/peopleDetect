@@ -73,13 +73,16 @@ struct Odroid {
 	int EndXCoordinate=320;
 	int leftOverlap =20;
 	int rightOverlap=20;
+	int currentX;
 };
 
 int main (int argc, const char * argv[])
 {
-	printf("Hello\n");
+
+
 	cout << "Hello Artyom" << endl << flush ;
     VideoCapture cap;
+    Odroid *currentOroid;
     Odroid *odroid1 = new Odroid();
     Odroid *odroid2 = new Odroid();
     Odroid *odroid3 = new Odroid();
@@ -100,8 +103,11 @@ int main (int argc, const char * argv[])
     odroid4->rightOverlap = 0;
 
     Mat img;
-    cap = odroid1->cap;
 
+
+
+    cap = odroid1->cap;
+    currentOroid = odroid1;
 
     string Pos = "";
     HOGDescriptor hog;
@@ -112,13 +118,14 @@ int main (int argc, const char * argv[])
     while (true)
     {
 
-    	if(false){
+    	if(true){
 
 
     		switch(currentCamera)
     		{
     		case 1:
-    			currentCamera = 2;
+    			globalX = odroid1->currentX;
+    			//currentCamera = 2;
     			//cap = cap2;
     			cout << "chagned to cam2" << endl;
     			break;
@@ -150,7 +157,7 @@ int main (int argc, const char * argv[])
 
         size_t i, j;
 
-
+        //for (i=0; i<1; i++)
         for (i=0; i<found.size(); i++)
         {
             Rect r = found[i];
@@ -162,23 +169,23 @@ int main (int argc, const char * argv[])
         }
         for (i=0; i<found_filtered.size(); i++)
         {
-	    Rect r = found_filtered[i];
-            r.x += cvRound(r.width*0.1);
-	    r.width = cvRound(r.width*0.8);
-	    r.y += cvRound(r.height*0.06);
-	    r.height = cvRound(r.height*0.9);
+			Rect r = found_filtered[i];
+				r.x += cvRound(r.width*0.1);
+			r.width = cvRound(r.width*0.8);
+			r.y += cvRound(r.height*0.06);
+			r.height = cvRound(r.height*0.9);
 
-	    string x = to_string(r.x);
-	    string y = to_string(r.y);
-	    posRect = "Pos: x:" + x+ " y: " + y;
+			currentOroid->currentX = r.x;
 
-	    rectangle(img, r.tl(), r.br(), cv::Scalar(0,255,0), 2);
+			string x = to_string(r.x);
+			string y = to_string(r.y);
+
+			posRect = "Pos: x:" + to_string(globalX); //+ " y: " + y;
+
+			rectangle(img, r.tl(), r.br(), cv::Scalar(0,255,0), 2);
         }
 
 
-        int number  = 5;
-        char text[255];
-        sprintf(text, "Score %d", (int)number);
 
         CvFont font;
         double hScale=0.5;
@@ -192,7 +199,7 @@ int main (int argc, const char * argv[])
 
         memcpy(p, posRect.c_str(), posRect.length()+1);
 
-        cvPutText(img1, p, cvPoint(10,300), &font, cvScalar(0,255,0));
+        cvPutText(img1, p, cvPoint(10,230), &font, cvScalar(0,255,0));
 
 
         imshow("video capture", img);
