@@ -5,10 +5,10 @@
 #include <string.h>// std::string, std::to_string
 #include <assert.h>
 
-#define ODROID1 "http://192.168.0.101:8080/?action=stream"
+#define ODROID1 "http://192.168.0.102:8080/?action=stream"
 #define ODROID2 "http://192.168.0.106:8080/?action=stream"
-#define ODROID3 "http://192.168.0.102:8080/?action=stream"
-#define ODROID4 "http://192.168.0.116:8080/?action=stream"
+#define ODROID3 "http://192.168.0.116:8080/?action=stream"
+#define ODROID4 "http://192.168.0.115:8080/?action=stream"
 
 using namespace std;
 using namespace cv;
@@ -64,6 +64,7 @@ int main(int, char**) {
 
 
 int globalX = 0;
+int globalXToPrint=0;
 
 struct Odroid {
 	VideoCapture cap;
@@ -71,8 +72,8 @@ struct Odroid {
 	Odroid* leftNeighbour;
 	int StartXCoordinate= 0;
 	int EndXCoordinate=320;
-	int leftOverlap =90;
-	int rightOverlap=90;
+	int leftOverlap =20;
+	int rightOverlap=50;
 	int currentX;
 	int length = 320;
 };
@@ -90,8 +91,8 @@ int main (int argc, const char * argv[])
     Odroid *odroid4 = new Odroid();
     odroid1->cap.open(ODROID1);
     odroid2->cap.open(ODROID2);
-   // odroid3->cap.open(ODROID3);
-   // odroid4->cap.open(ODROID4);
+    odroid3->cap.open(ODROID3);
+    odroid4->cap.open(ODROID4);
     odroid1->leftNeighbour=odroid1;
     odroid1->rightNeighbour=odroid2;
     odroid1->leftOverlap=0;
@@ -100,7 +101,7 @@ int main (int argc, const char * argv[])
     odroid3->leftNeighbour=odroid2;
     odroid3->rightNeighbour=odroid4;
     odroid4->leftNeighbour=odroid3;
-    odroid4->rightNeighbour=odroid4;
+    //odroid4->rightNeighbour=odroid4;
     odroid4->rightOverlap = 0;
 
     Mat img;
@@ -168,7 +169,7 @@ int main (int argc, const char * argv[])
     		case 4:
     			globalX = odroid1->length + odroid2->length  +  odroid3->length
     					+ odroid4->currentX - odroid4->leftOverlap ;
-    			if (odroid4->currentX > (odroid4->StartXCoordinate - odroid1->leftOverlap)){
+    			if (odroid4->currentX < (odroid4->StartXCoordinate - odroid4->leftOverlap)){
         			currentCamera = 3;
         			cap = odroid3->cap;
         			currentOdroid = odroid3;
@@ -216,8 +217,10 @@ int main (int argc, const char * argv[])
 
 			string x = to_string(r.x);
 			string y = to_string(r.y);
-
-			posRect = "Pos: x:" + to_string(globalX); //+ " y: " + y;
+			if(abs(globalX- globalXToPrint)>5){
+				globalXToPrint=globalX;
+			}
+			posRect = "Pos: x:" + to_string(globalXToPrint); //+ " y: " + y;
 
 			rectangle(img, r.tl(), r.br(), cv::Scalar(0,255,0), 2);
         }
@@ -236,7 +239,7 @@ int main (int argc, const char * argv[])
 
         memcpy(p, posRect.c_str(), posRect.length()+1);
 
-        cvPutText(img1, p, cvPoint(10,230), &font, cvScalar(0,255,0));
+        cvPutText(img1, p, cvPoint(10,230), &font, cvScalar(240,0,0));
 
 
         imshow("video capture", img);
